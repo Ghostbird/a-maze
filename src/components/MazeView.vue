@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { generate, orthogonal, nodesRectangle, type MazeNode } from '@/utils/maze'
-import { Room } from '@/utils/room';
 import type { MazeRenderMode } from '@/utils/render';
 import MazeSvg from '@/components/MazeSvg.vue';
+import MazeCanvasTiles from '@/components/MazeCanvasTiles.vue';
+import { onMounted, reactive } from 'vue';
+import { maze2d } from '@/utils/maze2d';
 const props = withDefaults(defineProps<
-  { width: number, height: number, renderMode: MazeRenderMode }>(), {
-  width: 10, height: 10, renderMode: 'svg',
+  { width: number, height: number, renderMode?: MazeRenderMode }>(), {
+  renderMode: 'svg',
 });
-const rooms = Array.from(generate(
-  nodesRectangle(props.width, props.height).map(node => new Room(node)),
-  orthogonal<MazeNode>(
-    (r) => r.x,
-    (r) => r.y
-  )
-)).map(([room, neighbours]) => neighbours.reduce((room: Room, neighbour) => room.withNeighbour(neighbour), room));
-rooms[rooms.length - 1].withExit('south', 'exit');
-rooms[0].withExit('north', 'entrance');
+const state = reactive<{ renderMode: MazeRenderMode }>({ renderMode: 'svg' })
+function updateRenderMode(ev: { target: HTMLSelectElement & { value: MazeRenderMode } }) { state.renderMode = ev.target.value }
+const maze = maze2d(props.width, props.height)
+onMounted(() => state.renderMode = props.renderMode)
 </script>
 <template>
-  <MazeSvg v-if="renderMode === 'svg'" :maze="rooms" :width="width" :height="height" />
+  <select name="renderMode" :value="state.renderMode" @change="updateRenderMode">
+    <option value="svg">SVG</option>
+    <option value="tiles">Canvas bitmap tiles</option>
+  </select>
+  <MazeSvg v-if="state.renderMode === 'svg'" :maze="maze" />
+  <MazeCanvasTiles v-if="state.renderMode === 'tiles'" :maze="maze" />
 </template>
 <style scoped>
 </style>

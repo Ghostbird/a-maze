@@ -1,17 +1,18 @@
-import type { MazeNode } from '@/utils/maze'
+import type { Range } from '@/utils/range'
+import type { MazeNode2D } from '@/utils/maze2d'
 
 export type Exit = 'entrance' | 'exit'
 const directions: Direction[] = ['north', 'east', 'south', 'west']
 export type Direction = 'east' | 'north' | 'south' | 'west'
 
-export class Room implements MazeNode, Record<Direction, Room | Exit | null> {
+export class Room2D implements MazeNode2D, Record<Direction, Room2D | Exit | null> {
   x!: number
   y!: number
-  east: Room | Exit | null = null
-  north: Room | Exit | null = null
-  south: Room | Exit | null = null
-  west: Room | Exit | null = null
-  constructor(node: MazeNode) {
+  east: Room2D | Exit | null = null
+  north: Room2D | Exit | null = null
+  south: Room2D | Exit | null = null
+  west: Room2D | Exit | null = null
+  constructor(node: MazeNode2D) {
     // Copy all properties of the Node
     Object.assign(this, node)
   }
@@ -22,7 +23,7 @@ export class Room implements MazeNode, Record<Direction, Room | Exit | null> {
       exits: directions.filter((key) => this[key])
     }
   }
-  relativePositionKey(other: Room): 'east' | 'north' | 'south' | 'west' {
+  relativePositionKey(other: Room2D): 'east' | 'north' | 'south' | 'west' {
     const result = (
       [
         [undefined, 'north', undefined],
@@ -40,14 +41,15 @@ export class Room implements MazeNode, Record<Direction, Room | Exit | null> {
     this[dir] = exit
     return this
   }
-  withNeighbour(neighbour: Room): this {
+  withNeighbour(neighbour: Room2D): this {
     this[this.relativePositionKey(neighbour)] = neighbour
     return this
   }
-  get tileType() {
-    return ['north', 'east', 'south', 'west'].reduce(
-      (tileType, cardinal, index) => (tileType |= cardinal ? 0x01 : 0 << index),
+  /** Returns a bitmask of which exits are available. Can be used by renderer to map tiles. */
+  get tileType(): Range<0, 15> {
+    return directions.reduce(
+      (tileType, cardinal, index) => (tileType |= (this[cardinal] ? 0x01 : 0) << index),
       0x0
-    )
+    ) as unknown as Range<0, 15>
   }
 }
