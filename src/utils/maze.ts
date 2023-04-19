@@ -1,4 +1,7 @@
-const { abs, floor, random, min, max } = Math
+import { choose, first, type Choice } from '@/utils/choice'
+
+const { abs, min, max } = Math
+
 /** A maze is a mapping of nodes to the nodes it connects to */
 export type Maze<T> = Map<T, T[]>
 export type Dimension<T> = {
@@ -7,8 +10,6 @@ export type Dimension<T> = {
 }
 /** Given a list of dimension extraction functions, returns an adjacency function for Ts in that many dimensions. */
 export type Adjacency = <T>(...dimensions: Dimension<T>[]) => (a: T, b: T) => boolean
-/** Random choice that returns undefined when the input is an empty set */
-export type Choice<T> = (options: T[]) => T | undefined
 /** Returns a function that will return the adjacency function that returns true only when two nodes are orthogonally adjacent for a given number of dimensions */
 export const orthogonal: Adjacency =
   (...dimensions) =>
@@ -17,24 +18,26 @@ export const orthogonal: Adjacency =
       (diff, dimension) => (diff += abs(dimension.get(a) - dimension.get(b))),
       0
     ) === 1
-/** Randomly choose a single value from an array */
-export const choose = <T>(options: T[]) => options[floor(random() * options.length)]
 /** Depth-first search maze generation */
 export const generate = <T>(
   nodes: T[],
   adjacent: (a: T, b: T) => boolean,
   // Default is the random choice function
   chooseNeighbour: Choice<T> = choose<T>,
-  // Default is the first node
-  chooseStartingPoint: Choice<T> = (x) => x[0]
+  /** Choose starting node for maze generation. Default is the first node */
+  chooseStartingPoint: Choice<T> = first<T>,
+  /** Next node selection function to change search method.
+   * Nodes are in an array with the most recent processed node at the start.
+   * The default is to choose the first node, which is equivalent to depth-first search. */
+  chooseContinuation: Choice<T> = first<T>
 ): Maze<T> => {
   // Choose a node where we will start
-  const stack = [chooseStartingPoint(nodes)]
+  let unfinishedNodes = [chooseStartingPoint(nodes)!]
   // Initialise map of node + zero connected neighbours
   const maze = new Map(nodes.map((node) => [node, [] as T[]]))
   let node: T | undefined
   // We're not done if there are nodes on the stack.
-  while ((node = stack[0])) {
+  while ((node = chooseContinuation(unfinishedNodes))) {
     // Choose a random neighbour if any.
     const neighbour = chooseNeighbour(
       nodes.filter((other) => !maze.get(other)!.length && adjacent(node!, other))
@@ -43,11 +46,11 @@ export const generate = <T>(
       // Connect the two nodes
       maze.get(node)!.push(neighbour)
       maze.get(neighbour)!.push(node)
-      // Continue processing from the neighbour node.
-      stack.unshift(neighbour)
+      // Add neighbour to list of unfinished nodes
+      unfinishedNodes.unshift(neighbour)
     } else {
-      // If no neighbours are found, backtrack
-      stack.shift()
+      // If no neighbours are found, this node is finished
+      unfinishedNodes = unfinishedNodes.filter((n) => n !== node)
     }
   }
   return maze
@@ -67,7 +70,10 @@ export const distanceMap = <T>(maze: Maze<T>, start: T): Map<T, number> => {
     const neighbour = mutableMaze.get(node)?.pop()
     if (neighbour) {
       // Remove path that we followed here.
-      mutableMaze.set(neighbour, mutableMaze.get(neighbour)!.filter(n => n !== node))
+      mutableMaze.set(
+        neighbour,
+        mutableMaze.get(neighbour)!.filter((n) => n !== node)
+      )
       // Set neighbour distance
       distances.set(neighbour, distances.get(node)! + 1)
       // Continue processing from the neighbour node.
