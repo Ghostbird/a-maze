@@ -10,6 +10,15 @@ export type Dimension<T> = {
 }
 /** Given a list of dimension extraction functions, returns an adjacency function for Ts in that many dimensions. */
 export type Adjacency = <T>(...dimensions: Dimension<T>[]) => (a: T, b: T) => boolean
+/** Edge node, with information that describes in which dimension and in what direction the edge lies. */
+export type EdgeNode<T> = {
+  node: T
+  edges: {
+    dimension: Dimension<T>
+    /** Sign is -1 (at minimum for dimension), 0 (not at limit for dimension), or +1 (at maximum for dimension) */
+    sign: number
+  }[]
+}
 /** Returns a function that will return the adjacency function that returns true only when two nodes are orthogonally adjacent for a given number of dimensions */
 export const orthogonal: Adjacency =
   (...dimensions) =>
@@ -98,7 +107,16 @@ export const farthestNode = <T>(maze: Maze<T>, start: T): T =>
 /** Returns the node that lies on the edge of the maze, farthest from a given starting point
  * Also return the dimensions in which it lies on the edge, and in which direction.
  */
-export const farthestEdgeNode = <T>(maze: Maze<T>, start: T, ...dimensions: Dimension<T>[]) => {
+export const farthestEdgeNode = <T>(maze: Maze<T>, start: T, edgeNodes: EdgeNode<T>[]): EdgeNode<T> => {
+  // Calculate path lengths in maze
+  const distances = distanceMap(maze, start)
+  // Get the edge node with the highest distance from start
+  return edgeNodes.reduce((max, curr) =>
+    distances.get(curr.node)! > distances.get(max.node)! ? curr : max
+  )
+}
+
+export const edgeNodes = <T>(maze: Maze<T>, start: T, ...dimensions: Dimension<T>[]): EdgeNode<T>[] => {
   // First calculate the minimum and maximum value for every dimension of the maze.
   const limits = dimensions.map((dimension) => ({
     dimension: dimension,
@@ -110,10 +128,10 @@ export const farthestEdgeNode = <T>(maze: Maze<T>, start: T, ...dimensions: Dime
       .reduce((a, b) => max(a, b))
   }))
   // Filter all nodes so we only keep edge nodes, but for each, note in which dimension and in what direction the edge lies.
-  const edgeNodes = Array.from(maze.keys())
+  return Array.from(maze.keys())
     .map((node) => ({
       node: node,
-      limits: limits
+      edges: limits
         .map((limit) => {
           const dimVal = limit.dimension.get(node)
           return {
@@ -124,12 +142,5 @@ export const farthestEdgeNode = <T>(maze: Maze<T>, start: T, ...dimensions: Dime
         })
         .filter((limit) => limit.sign !== 0)
     }))
-    .filter(({ limits }) => limits.length)
-
-  // Calculate path lengths in maze
-  const distances = distanceMap(maze, start)
-  // Get the edge node with the highest distance from start
-  return edgeNodes.reduce((max, curr) =>
-    distances.get(curr.node)! > distances.get(max.node)! ? curr : max
-  )
+    .filter(({ edges: limits }) => limits.length)
 }

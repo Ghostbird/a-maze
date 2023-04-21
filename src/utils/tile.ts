@@ -6,7 +6,7 @@ const { floor } = Math
 
 export type TileType2D = Direction | Range<0, 16>
 /** A 2D tile set. It can be used to map Rooms to ImageBitmaps. */
-export type TileSet2D = { size: number } & { [K in TileType2D]: ImageBitmap }
+export type TileSet2D = { size: number } & Record<TileType2D, ImageBitmap>
 /** Holds the tile type definitions for a TileSet2D.
  * Tiles are read from left-to-right, from top-to-bottom from the tile-set image.
  * This array can be then be indexed to find the corresponding tile type */

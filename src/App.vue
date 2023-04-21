@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import MazeView from '@/components/MazeView.vue'
+import MazeGame from '@/components/MazeGame.vue'
 </script>
 
 <template>
   <header>
   </header>
   <main>
-    <MazeView :width="10" :height="10"/>
+    <MazeGame :width="10" :height="10"/>
   </main>
 </template>
 <style scoped>

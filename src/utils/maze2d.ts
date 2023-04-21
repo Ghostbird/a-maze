@@ -1,12 +1,12 @@
 import { last, type Choice, choose, first } from '@/utils/choice'
-import {
-  orthogonal,
-  farthestEdgeNode,
-  generate,
-  type Maze,
-} from '@/utils/maze'
+import { orthogonal, farthestEdgeNode, generate, type Maze, edgeNodes } from '@/utils/maze'
 import { Room2D, type Exit } from '@/utils/room'
 const { floor } = Math
+
+export interface Maze2D {
+  rooms: Room2D[]
+  start: Room2D
+}
 
 export class MazeNode2D {
   x: number = 0
@@ -36,35 +36,43 @@ export const maze2d = (
   chooseNeighbour: Choice<Room2D> = choose<Room2D>,
   chooseExit = last,
   chooseContinuation = first
-) => {
+): Maze2D => {
   const nodes = nodesRectangle(width, height).map((node) => new Room2D(node))
+  // Exit must be determined now
+  const exit = chooseExit(nodes)!
   const maze = generate<Room2D>(
     nodes,
     orthogonal<MazeNode2D>(...MazeNode2D.dimensions),
     chooseNeighbour,
-    chooseExit,
+    () => exit,
     chooseContinuation
   )
-  const rooms = Array.from(maze).map(([room, neighbours]) =>
-    neighbours.reduce((room: Room2D, neighbour) => room.withNeighbour(neighbour), room)
+  // Map neighbouring rooms
+  // This could have been a for-loop, but a `.forEach` allows a destructuring pattern whereas a for-loop doesn't.
+  Array.from(maze).forEach(([room, neighbours]) =>
+    neighbours.forEach((neighbour) => room.withNeighbour(neighbour))
   )
   // Add entrance and exit
-  return Array.from(addFarthestExit(maze, chooseExit(rooms)!.withExit('south', 'entrance'), 'entrance').keys())
+  const entrance = addFarthestExit(maze, exit.withExit('south', 'exit'), 'entrance')
+  return {
+    rooms: Array.from(maze.keys()),
+    start: entrance
+  }
 }
 
 /** Add an Exit at the farthest edge Room2D of a Maze<Room2D> relative to the start.
- * Note that the Exit can be an 'entrance.
+ * Note that the Exit can be an 'entrance'.
  * This depends on whether you lock the exit in place and look for a suitable entrance, or vice versa.
-*/
+ */
 const addFarthestExit = (maze: Maze<Room2D>, start: Room2D, exitType: Exit = 'exit') => {
-  // Get the farthest edge node, including the valid exit directions. 
-  const exit = farthestEdgeNode(maze, start, ...MazeNode2D.dimensions)
-  const exitLimit = choose(exit.limits)!
+  // Get the farthest edge node, including the valid exit directions.
+  const exit = farthestEdgeNode(maze, start, edgeNodes(maze, start, ...MazeNode2D.dimensions))
+  const exitEdge = choose(exit.edges)!
   // Craft a pseudo room that is a copy of the exit to take advantage of `relativePositionKey` later
-  const entrance = new Room2D({ ...exit.node })
+  const outside = new Room2D({ ...exit.node })
   // Shift the pseudo room one step on the limit dimension so it lies outside the maze
-  exitLimit.dimension.set(entrance, exitLimit.dimension.get(entrance) + exitLimit.sign)
+  exitEdge.dimension.set(outside, exitEdge.dimension.get(outside) + exitEdge.sign)
   // Connect to the pseudo room from the chosen exit, this creates an entrance
-  exit.node.withExit(exit.node.relativePositionKey(entrance), exitType)
-  return maze
+  exit.node.withExit(exit.node.relativePositionKey(outside), exitType)
+  return exit.node
 }
