@@ -1,9 +1,8 @@
-import type { Player2D } from '@/utils/player'
-import type { Direction } from '@/utils/room'
-import { Observable, filter, fromEvent, identity, map, tap } from 'rxjs'
+import type { Direction2D } from '@/utils/room'
+import { Observable, filter, fromEvent, map } from 'rxjs'
 
-export type Control2D = Observable<Direction>
-export type KeyMap2D = Record<string, Direction | undefined>
+export type Control2D = Observable<Direction2D>
+export type KeyMap2D = Record<string, Direction2D | undefined>
 
 export const arrowKeyMap: KeyMap2D = {
   ArrowUp: 'north',
@@ -27,15 +26,7 @@ export const defaultKeyboardControls = fromEvent<KeyboardEvent>(window, 'keydown
   filter(([, direction]) => !!direction),
   map(([keyPress, direction]) => {
     keyPress.preventDefault()
-    return direction
+    // The filter effectively removed `undefined` from the type union, but this is the first place where we can enforce it.
+    return direction as Direction2D
   })
 )
-
-export const movement = (
-  player: Player2D,
-  movement: Observable<Direction> = defaultKeyboardControls
-) =>
-  movement.pipe(
-    map((direction) => player.move(direction)),
-    filter(identity)
-  )

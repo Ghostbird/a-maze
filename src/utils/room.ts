@@ -2,10 +2,10 @@ import type { Range } from '@/utils/range'
 import type { MazeNode2D } from '@/utils/maze2d'
 
 export type Exit = 'entrance' | 'exit'
-const directions: Direction[] = ['north', 'east', 'south', 'west']
-export type Direction = 'east' | 'north' | 'south' | 'west'
+export const directions: Direction2D[] = ['north', 'east', 'south', 'west']
+export type Direction2D = 'east' | 'north' | 'south' | 'west'
 
-export class Room2D implements MazeNode2D, Record<Direction, Room2D | Exit | null> {
+export class Room2D implements MazeNode2D, Record<Direction2D, Room2D | Exit | null> {
   x!: number
   y!: number
   east: Room2D | Exit | null = null
@@ -37,7 +37,7 @@ export class Room2D implements MazeNode2D, Record<Direction, Room2D | Exit | nul
     }
     return result
   }
-  withExit(dir: Direction, exit: Exit): this {
+  withExit(dir: Direction2D, exit: Exit): this {
     this[dir] = exit
     return this
   }

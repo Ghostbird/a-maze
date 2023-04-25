@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { Observable, forkJoin, from, of, switchMap } from 'rxjs'
 import type { Range } from '@/utils/range'
-import type { Direction } from '@/utils/room'
+import type { Direction2D } from '@/utils/room'
 const { floor } = Math
 
-export type TileType2D = Direction | Range<0, 16>
+export type TileType2D = Direction2D | Range<0, 16>
 /** A 2D tile set. It can be used to map Rooms to ImageBitmaps. */
 export type TileSet2D = { size: number } & Record<TileType2D, ImageBitmap>
 /** Holds the tile type definitions for a TileSet2D.
