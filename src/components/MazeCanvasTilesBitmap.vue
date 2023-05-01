@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Player2D } from '@/utils/player';
+import type { Player2DAnimation } from '@/utils/animation';
 import type { Room2D } from '@/utils/room';
 import type { TileSet2D } from '@/utils/tile';
 import { getBitmapTileSet } from '@/utils/tile';
@@ -12,8 +12,9 @@ let tileSetSubscription: Subscription;
 const props = withDefaults(defineProps<{
   tilesUri?: string,
   rooms: Room2D[],
-  player: Player2D,
+  player: Player2DAnimation,
 }>(), { tilesUri: 'tilesets/test/test.png' });
+
 onMounted(() => tileSetSubscription = getBitmapTileSet(props.tilesUri).pipe(
   tap(({ size }) => {
     // Update canvas size on tile-set load
@@ -24,18 +25,26 @@ onMounted(() => tileSetSubscription = getBitmapTileSet(props.tilesUri).pipe(
     tileSet.value = loadedTileSet
     // We know this only happens once, so this is safe.
     window.requestAnimationFrame(draw);
-  }))
-onUnmounted(() => tileSetSubscription.unsubscribe())
+  })
+)
 
-function draw() {
+onUnmounted(() => {
+  // Unload tile set, stop animation.
+  tileSet.value = undefined;
+  tileSetSubscription.unsubscribe();
+})
+
+function draw(time: DOMHighResTimeStamp) {
   // Don't draw until tile-set is loaded.
   if (!tileSet.value) { return };
   const { size, ...tiles } = tileSet.value;
   const ctx2d = canvas.value!.getContext('2d');
+  // Update player animation
+  props.player.update(time)
   for (const room of props.rooms) {
     ctx2d?.drawImage(tiles[room.tileType], room.x * size, room.y * size);
   }
-  ctx2d?.drawImage(tiles[props.player.direction], props.player.room.x * size, props.player.room.y * size)
+  ctx2d?.drawImage(tiles[props.player.direction], props.player.x * size, props.player.y * size)
   window.requestAnimationFrame(draw);
 }
 
