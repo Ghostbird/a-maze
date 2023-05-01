@@ -23,7 +23,10 @@ export function choiceMovement2d(player: Player2D, direction: Direction2D): bool
     } else {
       break
     }
-    // Or it is the opposite direction
+    // Always pause before the exit
+    if (player.room[player.direction] === 'exit') {
+      break;
+    }
     if (
       directions.some(
         (dir) =>
