@@ -70,5 +70,13 @@ onUnmounted(() => {
   <canvas ref="mazeCanvas"></canvas>
   <canvas ref="playerCanvas"></canvas>
 </template>
-<style>
+<style scoped>
+canvas {
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
 </style>

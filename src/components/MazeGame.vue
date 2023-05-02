@@ -30,4 +30,9 @@ onUnmounted(moveSubscription.unsubscribe)
   <MazeCanvasTilesBitmap v-if="options.renderMode === 'tiles'" :rooms="rooms" :player="animatedPlayer" />
 </template>
 <style scoped>
+div {
+  width: calc(100vw - 2em);
+  height: calc(100vh - 200px);
+  position: initial;
+}
 </style>

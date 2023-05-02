@@ -10,8 +10,7 @@ const props = withDefaults(defineProps<{
   player: Player2DAnimation,
 }>(), { scale: 120 });
 onMounted(() => {
-  svg.value!.style.width = `${props.scale * (Math.max(...props.rooms.map(room => room.x)) + 1)}px`
-  svg.value!.style.height = `${props.scale * (Math.max(...props.rooms.map(room => room.y)) + 1)}px`
+  svg.value!.setAttribute('viewBox', `0 0 ${props.scale * (Math.max(...props.rooms.map(room => room.x)) + 1)} ${props.scale * (Math.max(...props.rooms.map(room => room.y)) + 1)}`)
   window.requestAnimationFrame(draw);
 })
 function draw(time: DOMHighResTimeStamp) {
@@ -24,9 +23,9 @@ function draw(time: DOMHighResTimeStamp) {
 </script>
 <template>
   <svg ref="svg" shape-rendering="crispEdges">
-    <g v-for="room, index in rooms" :transform="'translate(' + room.x * scale + ',' + room.y * scale + ')'" :key="index">
-      <rect class="wall" :width="scale" :height="scale" />
-      <!-- Note all the stupid -1 and +2 are to avoid render lines between the tiles. -->
+    <g v-for="room, index in rooms" :transform="`translate(${room.x * scale - 1},${room.y * scale + 2})`" :key="index">
+      <rect class="wall" :width="scale + 2" :height="scale + 2" />
+      <!-- Note all the stupid -1 and +2 are to avoid render artifacts between the tiles.-->
       <rect class="floor" :x="scale / 4" :y="scale / 4" :width="scale / 2" :height="scale / 2" />
       <rect class="floor" v-if="room.north" :x="scale / 4" :y="-1" :width="scale / 2" :height="scale / 4 + 2" />
       <rect class="floor" v-if="room.east" :x="scale / 4 * 3 - 1" :y="scale / 4" :width="scale / 4 + 2"
@@ -38,7 +37,7 @@ function draw(time: DOMHighResTimeStamp) {
     <rect ref="playerIcon" class="player" :width="scale / 4" :height="scale / 4" :x="3 / 8 * scale" :y="3 / 8 * scale" />
   </svg>
 </template>
-<style>
+<style scoped>
 .wall {
   fill: green;
 }
@@ -49,5 +48,14 @@ function draw(time: DOMHighResTimeStamp) {
 
 .player {
   fill: purple;
+}
+
+svg {
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
 }
 </style>

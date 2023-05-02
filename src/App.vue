@@ -46,13 +46,37 @@ const reloadWindow = () => window.location.reload()
   </main>
 </template>
 <style scoped>
+
+dialog {
+  min-width: 50vw;
+  min-height: 50vh;
+}
+
+dialog > h2 {
+  font-size: 10vmin;
+  width: 100%;
+  text-align: center;
+}
+
+dialog > form {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1em;
+  margin: 0 auto;
+  width: max-content;
+}
+
+dialog button {
+  font-size: 5vmin;
+}
+
 .options {
   display: grid;
   grid-template:
-    'a b'
-    'c d' auto / min-content 1fr;
+    'a b' min-content
+    'c d' min-content / min-content 1fr;
   gap: 0.1em 1em;
-  margin-bottom: 1em;
 }
 
 .options>span {
