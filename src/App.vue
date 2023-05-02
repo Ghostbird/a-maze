@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import MazeGame from '@/components/MazeGame.vue'
+import MazeControls from '@/components/MazeControls.vue'
 import type { MovementType } from '@/utils/movement';
 import type { MazeRenderMode } from '@/utils/render';
 import { reactive, ref } from 'vue';
+import type { Direction2D } from '@/utils/room';
+import { Subject } from 'rxjs';
 const dialog = ref(null as HTMLDialogElement | null)
+const guiMove = new Subject<Direction2D>();
 const options = reactive({
   renderMode: localStorage.getItem('renderMode') ?? 'svg',
   movementMode: localStorage.getItem('movementMode') as MovementType ?? 'step'
@@ -36,7 +40,12 @@ const reloadWindow = () => window.location.reload()
         <option value="choice">Decision</option>
       </select>
     </form>
-    <MazeGame :width="10" :height="10" :options="options" @exit="showDialog" />
+    <div style="grid-area:controls">
+      <MazeControls @move="direction => guiMove.next(direction)"></MazeControls>
+    </div>
+    <div style="grid-area:game">
+      <MazeGame :width="10" :height="10" :options="options" :guiMove="guiMove" @exit="showDialog" />
+    </div>
     <dialog ref="dialog">
       <h2>You won!</h2>
       <form method="dialog">
@@ -46,6 +55,13 @@ const reloadWindow = () => window.location.reload()
   </main>
 </template>
 <style scoped>
+main {
+  display: grid;
+  gap: 1em;
+  grid-template:
+    'game game game' min-content
+    'options . controls' min-content / max-content auto min-content;
+}
 
 dialog {
   min-width: 50vw;
@@ -72,6 +88,7 @@ dialog button {
 }
 
 .options {
+  grid-area: options;
   display: grid;
   grid-template:
     'a b' min-content
@@ -79,7 +96,30 @@ dialog button {
   gap: 0.1em 1em;
 }
 
+.options>* {
+  max-width: 50vw;
+}
+
+
 .options>span {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media screen and (max-width: 480px) {
+  main {
+    grid-template:
+      'game game' min-content
+      'options controls' min-content / min-content min-content;
+  }
+
+  .options {
+    grid-template:
+      'a' min-content
+      'b' min-content
+      'c' min-content
+      'd' min-content / min-content;
+  }
 }
 </style>
