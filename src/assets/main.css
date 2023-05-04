@@ -30,3 +30,13 @@ body {
   padding: 0;
   font-weight: normal;
 }
+
+a.router-link {
+  position: fixed;
+  text-decoration: none;
+  color: initial;
+  line-height: 5vmin;
+  top: 5vmin;
+  right: 5vmin;
+  font-size: 5vmin;
+}

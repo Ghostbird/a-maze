@@ -23,9 +23,9 @@ function draw(time: DOMHighResTimeStamp) {
 </script>
 <template>
   <svg ref="svg" shape-rendering="crispEdges">
+    <!-- Note all the stupid -1 and +2 are to avoid render artifacts between the tiles.-->
     <g v-for="room, index in rooms" :transform="`translate(${room.x * scale - 1},${room.y * scale + 2})`" :key="index">
       <rect class="wall" :width="scale + 2" :height="scale + 2" />
-      <!-- Note all the stupid -1 and +2 are to avoid render artifacts between the tiles.-->
       <rect class="floor" :x="scale / 4" :y="scale / 4" :width="scale / 2" :height="scale / 2" />
       <rect class="floor" v-if="room.north" :x="scale / 4" :y="-1" :width="scale / 2" :height="scale / 4 + 2" />
       <rect class="floor" v-if="room.east" :x="scale / 4 * 3 - 1" :y="scale / 4" :width="scale / 4 + 2"

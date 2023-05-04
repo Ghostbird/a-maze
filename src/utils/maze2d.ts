@@ -25,7 +25,7 @@ export class MazeNode2D {
 
 /** Generate maze nodes in a rectangle shape. */
 const nodesRectangle = (width: number, height: number): MazeNode2D[] =>
-  new Array(width * height).fill({}).map((_, ix) => ({ x: ix % height, y: floor(ix / width) }))
+  new Array(width * height).fill({}).map((_, ix) => ({ x: ix % width, y: floor(ix / width) }))
 
 /** Generate a rectangular 2D maze. The entrance is placed to maximise travel distance through the maze.
  * You can customise the maze by passing different selection functions for the neighbour choice function and the exit choice function
