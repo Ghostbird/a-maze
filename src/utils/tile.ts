@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Observable, forkJoin, from, of, switchMap } from 'rxjs'
+import { Observable, forkJoin, from, of, switchMap, tap } from 'rxjs'
 import type { Range } from '@/utils/range'
 import type { Direction2D } from '@/utils/room'
 const { floor } = Math
@@ -35,30 +35,35 @@ export const defaultTileTypeOrder: TileSet2DTypeOrder = [
   'west'
 ]
 
+const tileCache: Record<string, TileSet2D> = {}
+
 export function getBitmapTileSet(
   uri: string,
   tileTypeOrder = defaultTileTypeOrder
 ): Observable<TileSet2D> {
-  return from(axios.get<Blob>(uri, { responseType: 'blob' })).pipe(
-    // Get the tileset image
-    switchMap((response) => createImageBitmap(response.data)),
-    switchMap((image) => {
-      const size = floor(image.width / 5)
-      return forkJoin(
-        new Array(20).fill(image).reduce(
-          (tileSet, img, ix) => ({
-            ...tileSet,
-            [tileTypeOrder[ix]]: createImageBitmap(
-              img,
-              size * floor(ix % 5),
-              size * floor(ix / 5),
-              size,
-              size
-            )
-          }),
-          { size: of(size) }
-        ) as { [K in keyof TileSet2D]: Observable<TileSet2D[K]> }
+  return uri in tileCache
+    ? of(tileCache[uri])
+    : from(axios.get<Blob>(uri, { responseType: 'blob' })).pipe(
+        // Get the tileset image
+        switchMap((response) => createImageBitmap(response.data)),
+        switchMap((image) => {
+          const size = floor(image.width / 5)
+          return forkJoin(
+            new Array(20).fill(image).reduce(
+              (tileSet, img, ix) => ({
+                ...tileSet,
+                [tileTypeOrder[ix]]: createImageBitmap(
+                  img,
+                  size * floor(ix % 5),
+                  size * floor(ix / 5),
+                  size,
+                  size
+                )
+              }),
+              { size: of(size) }
+            ) as { [K in keyof TileSet2D]: Observable<TileSet2D[K]> }
+          )
+        }),
+        tap((tileSet) => (tileCache[uri] = tileSet))
       )
-    })
-  )
 }
