@@ -17,9 +17,8 @@ On every page load, a new maze is generated. The exit is always the south from t
 
 ## New feature ideas 
 
-- Move render mode selection and movement mode selection to separate settings page.
-- Option to move on-screen controls to the left.
 - Audio renderer, like the Selenetic Age maze in Myst.
+- Load external tile-sets
 
 ## Project Setup
 
