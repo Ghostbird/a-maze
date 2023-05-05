@@ -1,5 +1,7 @@
 # A Maze
 
+[Try it!](https://maze.ghostbird.nl)
+
 On every page load, a new maze is generated. The exit is always the south from the bottom-right corner. After generation the entrance is chosen such that the length of the path through the maze is maximised.
 
 ## Features
