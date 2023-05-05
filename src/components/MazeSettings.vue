@@ -3,8 +3,9 @@ import { getSettings, type MazeSettings } from '@/utils/settings';
 
 const settingsKey = 'settings'
 const settings = getSettings();
-const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: { target: HTMLElement & { value: MazeSettings[K] } }) => {
-  settings[key] = ev.target.value;
+const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: Event) => {
+  // Awkward cast required because a DOM input change event is an `Event` whose `target` has no `value`
+  settings[key] = (ev as unknown as { target: HTMLElement & { value: MazeSettings[K] }}).target.value;
   localStorage.setItem(settingsKey, JSON.stringify(settings));
 }
 </script>
