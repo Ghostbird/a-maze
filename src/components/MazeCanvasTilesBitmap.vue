@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Player2DAnimation } from '@/utils/animation';
 import type { Room2D } from '@/utils/room';
+import { defaultMazeSettings } from '@/utils/settings';
 import type { TileSet2D } from '@/utils/tile';
 import { getBitmapTileSet } from '@/utils/tile';
 import { tap, type Subscription } from 'rxjs';
@@ -14,7 +15,7 @@ const props = withDefaults(defineProps<{
   tilesUri?: string,
   rooms: Room2D[],
   player: Player2DAnimation,
-}>(), { tilesUri: 'tilesets/default/default.png' });
+}>(), { tilesUri: defaultMazeSettings.builtInTileSet });
 
 const drawMaze = () => {
   // Abort if tile-set is not loaded or canvas was not rendered
@@ -44,7 +45,7 @@ const drawPlayer = (time: DOMHighResTimeStamp) => {
   window.requestAnimationFrame(drawPlayer);
 }
 
-onMounted(() => tileSetSubscription = getBitmapTileSet(props.tilesUri).pipe(
+onMounted(() => tileSetSubscription = getBitmapTileSet(props.tilesUri || defaultMazeSettings.builtInTileSet).pipe(
   tap(({ size }) => {
     // Update canvas size on tile-set load
     mazeCanvas.value!.width = playerCanvas.value!.width = size * (Math.max(...props.rooms.map(room => room.x)) + 1)

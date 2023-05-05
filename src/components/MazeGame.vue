@@ -37,7 +37,8 @@ onUnmounted(() => moveSubscription.unsubscribe)
   <main>
     <div class="maze">
       <MazeSvg v-if="settings.renderMode === 'svg'" :rooms="rooms" :player="animatedPlayer" />
-      <MazeCanvasTilesBitmap v-if="settings.renderMode === 'tiles'" :rooms="rooms" :player="animatedPlayer" />
+      <MazeCanvasTilesBitmap v-if="settings.renderMode === 'tiles'" :rooms="rooms" :player="animatedPlayer"
+        :tiles-uri="settings.customTileSetUri ?? settings.builtInTileSet" />
     </div>
     <router-link v-bind="$attrs" class='router-link' to="/settings">⚙</router-link>
     <MazeControls @move="direction => guiMove.next(direction)"></MazeControls>

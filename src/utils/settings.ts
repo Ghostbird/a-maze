@@ -7,6 +7,8 @@ export type MazeSettings = {
   width: number
   height: number
   controlPreference: 'left' | 'middle' | 'right'
+  builtInTileSet: string
+  customTileSetUri: string
 }
 
 export const defaultMazeSettings: MazeSettings = {
@@ -14,7 +16,9 @@ export const defaultMazeSettings: MazeSettings = {
   movementMode: 'choice',
   width: 10,
   height: 10,
-  controlPreference: 'right'
+  controlPreference: 'right',
+  builtInTileSet: 'tilesets/default/default.png',
+  customTileSetUri: 'tilesets/default/default.png'
 }
 
 export const getSettings = (key = 'settings'): MazeSettings =>
