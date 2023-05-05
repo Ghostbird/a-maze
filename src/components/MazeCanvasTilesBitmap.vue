@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<{
   tilesUri?: string,
   rooms: Room2D[],
   player: Player2DAnimation,
-}>(), { tilesUri: 'tilesets/test/test.png' });
+}>(), { tilesUri: 'tilesets/default/default.png' });
 
 const drawMaze = () => {
   // Abort if tile-set is not loaded or canvas was not rendered
