@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { defaultMazeSettings, getSettings, type MazeSettings } from '@/utils/settings';
+import { builtInTileSets, getSettings, type MazeSettings } from '@/utils/settings';
 import { reactive } from 'vue';
 const settingsKey = 'settings'
 const settings = reactive(getSettings());
 const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: Event) => {
   // Awkward cast required because a DOM input change event is an `Event` whose `target` has no `value`
   settings[key] = (ev as unknown as { target: HTMLElement & { value: MazeSettings[K] } }).target.value;
+  if (settings['builtInTileSet'] == '') {
+    settings['builtInTileSet'] = undefined;
+  }
   localStorage.setItem(settingsKey, JSON.stringify(settings));
 }
 </script>
@@ -26,7 +29,7 @@ const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: Event) => {
         <span style="grid-area: tileSet">Tile-set:</span>
         <select style="grid-area: tileSetChoice" name="tilesUri" :value="settings.builtInTileSet"
           @change="$event => updateSetting('builtInTileSet')($event)">
-          <option :value="defaultMazeSettings.builtInTileSet">Default</option>
+          <option v-for="(path, key) in builtInTileSets" :value="path">{{key}}</option>
           <option value="">Load from URI</option>
         </select>
       </template>
