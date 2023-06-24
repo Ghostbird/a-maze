@@ -17,7 +17,6 @@ const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: Event) => {
     <h1>Settings</h1>
   </header>
   <main>
-    <router-link v-bind="$attrs" class='router-link' to="/">⏎</router-link>
     <form>
       <span style="grid-area: renderMode">Render mode:</span>
       <select style="grid-area: renderChoice" name="renderMode" :value="settings.renderMode"
@@ -78,6 +77,7 @@ const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: Event) => {
         Once you've made your own tile-set, upload it somewhere <em>publicly</em> accessible on the internet. Then choose <em>Tile-set: Load from URI</em> above, and paste the URI in the field <em>Custom tile-set URI</em>.
       </p>
     </div>
+    <router-link v-bind="$attrs" class='router-link' to="/">⏎</router-link>
   </main>
 </template>
 <style scoped>
