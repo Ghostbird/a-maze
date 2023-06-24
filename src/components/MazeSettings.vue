@@ -72,7 +72,7 @@ const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: Event) => {
           template</a>
       </p>
       <p>
-        Once you've made your own tile-set, upload it somewhere <em>publicly</em> accessible on the internet and paste the URI in the field <em>Custom tile-set URI</em> above.
+        Once you've made your own tile-set, upload it somewhere <em>publicly</em> accessible on the internet. Then choose <em>Tile-set: Load from URI</em> above, and paste the URI in the field <em>Custom tile-set URI</em>.
       </p>
     </div>
   </main>
