@@ -19,8 +19,7 @@ On every page load, a new maze is generated. The exit is always the south from t
 
 ## New feature ideas 
 
-- Audio renderer, like the Selenetic Age maze in Myst.
-- Load external tile-sets
+An audio renderer, inspired by the Selenetic Age maze in Myst.
 
 ## Project Setup
 
