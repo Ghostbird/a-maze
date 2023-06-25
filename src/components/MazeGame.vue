@@ -11,11 +11,13 @@ import MazeControls from '@/components/MazeControls.vue';
 import MazeCanvasTilesBitmap from '@/components/MazeCanvasTilesBitmap.vue';
 import MazeSvg from '@/components/MazeSvg.vue';
 import type { Direction2D } from '@/utils/room';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { builtinTileSetUri, getSettings, type MazeSettings } from '@/utils/settings';
 const { random } = Math;
 const dialog = ref(null as HTMLDialogElement | null)
 const router = useRouter();
+// Save query parameters now, because we can't ask for them in de reloadPage handler.
+const query = `/?${Object.entries(useRoute()?.query ?? {}).map(([key, value]) => `${key}=${value}`)?.join('&')}`;
 const props = withDefaults(defineProps<{ settings?: MazeSettings }>(), { settings: () => getSettings() });
 const { rooms, start } = maze2d(props.settings!.width, props.settings!.height, choose, last, first)
 const showDialog = () => dialog.value?.showModal()
@@ -25,12 +27,12 @@ player.exitReached.then(showDialog)
 const guiMove = new Subject<Direction2D>();
 const moveSubscription = merge(defaultKeyboardControls, guiMove)
   .pipe(map(direction => movement2d[props.settings!.movementMode](player, direction))).subscribe()
-const reloadWindow = () => router
+const reloadPage = () => router
   // Add a random hash fragment. Because we've added `:key='$route.fullPath' to the <router-view> on App.vue
   // This will rerender the routed (the current) component.
-  .replace(`#${random().toString(32).substring(2)}`)
+  .replace(`${query}#${random().toString(32).substring(2)}`)
   // Then quickly disappear the ugly hash fragment again.
-  .then(() => history.replaceState(null, '', '/'))
+  .then(() => history.replaceState(null, '', `${query}`))
 onUnmounted(() => moveSubscription.unsubscribe)
 </script>
 <template>
@@ -45,7 +47,7 @@ onUnmounted(() => moveSubscription.unsubscribe)
     <dialog ref="dialog">
       <h2>You won!</h2>
       <form method="dialog">
-        <button @click="reloadWindow">Play again</button>
+        <button @click="reloadPage">Play again</button>
       </form>
     </dialog>
   </main>
