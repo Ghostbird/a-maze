@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { builtInTileSets, getSettings, type MazeSettings } from '@/utils/settings';
+import { builtInTileSets, builtinTileSetUri, getSettings, type MazeSettings } from '@/utils/settings';
 import { reactive } from 'vue';
 const settingsKey = 'settings'
 const settings = reactive(getSettings());
 const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: Event) => {
   // Awkward cast required because a DOM input change event is an `Event` whose `target` has no `value`
   settings[key] = (ev as unknown as { target: HTMLElement & { value: MazeSettings[K] } }).target.value;
-  if (settings['builtInTileSet'] == '') {
-    settings['builtInTileSet'] = undefined;
-  }
   localStorage.setItem(settingsKey, JSON.stringify(settings));
 }
 </script>
@@ -63,7 +60,7 @@ const updateSetting = <K extends keyof MazeSettings>(key: K) => (ev: Event) => {
     </form>
     <div v-if="settings.renderMode === 'tiles'" class="tile-set">
       <span>Tile-set preview:</span>
-      <img :src="settings.builtInTileSet || settings.customTileSetUri" error="Failed to load!" />
+      <img :src="builtinTileSetUri(settings.builtInTileSet) ?? settings.customTileSetUri" error="Failed to load!" />
       <h2>Create your own!</h2>
       <p>
         <a href="tilesets/default/default.svg" target="blank" download="tileset-template.svg">Download tile-set SVG

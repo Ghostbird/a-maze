@@ -12,7 +12,7 @@ import MazeCanvasTilesBitmap from '@/components/MazeCanvasTilesBitmap.vue';
 import MazeSvg from '@/components/MazeSvg.vue';
 import type { Direction2D } from '@/utils/room';
 import { useRouter } from 'vue-router';
-import { getSettings, type MazeSettings } from '@/utils/settings';
+import { builtinTileSetUri, getSettings, type MazeSettings } from '@/utils/settings';
 const { random } = Math;
 const dialog = ref(null as HTMLDialogElement | null)
 const router = useRouter();
@@ -38,7 +38,7 @@ onUnmounted(() => moveSubscription.unsubscribe)
     <div class="maze">
       <MazeSvg v-if="settings.renderMode === 'svg'" :rooms="rooms" :player="animatedPlayer" />
       <MazeCanvasTilesBitmap v-if="settings.renderMode === 'tiles'" :rooms="rooms" :player="animatedPlayer"
-        :tiles-uri="settings.builtInTileSet ?? settings.customTileSetUri" />
+        :tiles-uri="builtinTileSetUri(settings.builtInTileSet) ?? settings.customTileSetUri" />
     </div>
     <router-link v-bind="$attrs" class='router-link' to="/settings">⚙</router-link>
     <MazeControls @move="direction => guiMove.next(direction)"></MazeControls>

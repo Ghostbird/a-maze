@@ -1,30 +1,49 @@
+import { migrateSettings } from '@/utils/migrations'
 import type { MovementType } from '@/utils/movement'
 import type { MazeRenderMode } from '@/utils/render'
+import { useRoute } from 'vue-router'
 
 export type MazeSettings = {
+  version: number
   renderMode: MazeRenderMode
   movementMode: MovementType
   width: number
   height: number
   controlPreference: 'left' | 'middle' | 'right'
-  builtInTileSet: string | undefined
-  customTileSetUri: string | undefined
+  builtInTileSet: string
+  customTileSetUri: string
+}
+
+export const currentVersion = {
+  version: 1
 }
 
 export const defaultMazeSettings: MazeSettings = {
+  ...currentVersion,
   renderMode: 'tiles',
   movementMode: 'choice',
   width: 10,
   height: 10,
   controlPreference: 'right',
-  builtInTileSet: 'tilesets/default/default.png',
-  customTileSetUri: 'tilesets/default/default.png'
+  builtInTileSet: 'default',
+  customTileSetUri: 'default'
 }
 
 export const builtInTileSets = {
-  Default: 'tilesets/default/default.png',
-  Multiplex: 'tilesets/multiplex/multiplex.png'
+  Default: 'default',
+  Multiplex: 'multiplex'
 }
 
-export const getSettings = (key = 'settings'): MazeSettings =>
-  Object.assign({}, defaultMazeSettings, JSON.parse(localStorage.getItem(key) ?? '{}'))
+export const builtinTileSetUri = (builtInTileSetName: string) =>
+  !!builtInTileSetName ? `tilesets/${builtInTileSetName}/${builtInTileSetName}.png` : undefined
+
+export const getSettings = (key = 'settings'): MazeSettings => {
+  let localStorageSettings = (JSON.parse(localStorage.getItem(key) ?? `${null}`) ??
+    currentVersion) as typeof currentVersion & Record<string, unknown>
+  if (localStorageSettings.version !== defaultMazeSettings.version) {
+    localStorageSettings = migrateSettings(localStorageSettings)
+    //‌ Save migrated settings
+    localStorage.setItem(key, JSON.stringify(localStorageSettings))
+  }
+  return Object.assign({}, defaultMazeSettings, localStorageSettings)
+}

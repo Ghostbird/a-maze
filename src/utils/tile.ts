@@ -44,7 +44,7 @@ export function getBitmapTileSet(
   return uri in tileCache
     ? of(tileCache[uri])
     : from(axios.get<Blob>(uri, { responseType: 'blob' })).pipe(
-        // Get the tileset image
+        // Get the tile-set image
         switchMap((response) => createImageBitmap(response.data)),
         switchMap((image) => {
           const size = floor(image.width / 5)
