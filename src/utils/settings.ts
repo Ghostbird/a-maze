@@ -45,5 +45,8 @@ export const getSettings = (key = 'settings'): MazeSettings => {
     //‌ Save migrated settings
     localStorage.setItem(key, JSON.stringify(localStorageSettings))
   }
-  return Object.assign({}, defaultMazeSettings, localStorageSettings)
+  return Object.assign({}, defaultMazeSettings, localStorageSettings, routedSettings())
 }
+
+export const routedSettings = () =>
+  Object.fromEntries(Object.entries(useRoute().query).filter(([key]) => key in defaultMazeSettings))
