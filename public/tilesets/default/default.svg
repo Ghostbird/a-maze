@@ -11,11 +11,11 @@
    viewBox="0 0 169.33334 135.46666"
    version="1.1"
    id="svg8"
-   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
-   sodipodi:docname="test.svg"
-   inkscape:export-filename="./default.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="default.svg"
+   inkscape:export-filename="default.png"
+   inkscape:export-xdpi="180"
+   inkscape:export-ydpi="180">
    <style>
    .wall { fill:#91b245 }
    .inter { fill:#d8d2bd }
@@ -55,7 +55,10 @@
       inkscape:snap-bbox="true"
       inkscape:bbox-nodes="false"
       inkscape:snap-others="true"
-      inkscape:object-paths="true">
+      inkscape:object-paths="true"
+      inkscape:showpageshadow="0"
+      inkscape:pagecheckerboard="1"
+      inkscape:deskcolor="#d1d1d1">
       <inkscape:grid spacingx="33.866667"
          spacingy="33.866667"
          type="xygrid"
@@ -66,7 +69,7 @@
          <cc:Work rdf:about="">
             <dc:format>image/svg+xml</dc:format>
             <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-            <dc:title></dc:title>
+            <dc:title />
          </cc:Work>
       </rdf:RDF>
    </metadata>
